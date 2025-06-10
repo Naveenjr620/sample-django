@@ -22,4 +22,7 @@ from django.conf import settings
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("blog.urls"))
+    path("health/", health_check),  # ✅ Health check endpoint
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
