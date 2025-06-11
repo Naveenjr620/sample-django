@@ -1,32 +1,34 @@
-# Use official Python base image
-FROM python:3.10-slim
-
-# Set environment variables
+# Use a more reliable base image
+FROM python:3.10-slim-buster
+ 
+# Environment variables to optimize Python behavior
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
-
-# Set work directory
+ 
+# Set working directory
 WORKDIR /app
-
+ 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
-
+    gettext \
+    curl \
+&& rm -rf /var/lib/apt/lists/*
+ 
 # Install Python dependencies
 COPY requirements.txt .
-RUN pip install --upgrade pip
-RUN pip install -r requirements.txt
-
-# Copy project files
+RUN pip install --no-cache-dir --upgrade pip \
+&& pip install --no-cache-dir -r requirements.txt
+ 
+# Copy the rest of the project
 COPY . .
-
-# Collect static files (optional: for production)
-RUN python manage.py collectstatic --noinput
-
-# Expose port 8000
+ 
+# Run collectstatic (you can remove if you're not using static files)
+RUN python manage.py collectstatic --noinput || true
+ 
+# Expose port for Gunicorn/Django
 EXPOSE 5000
-
-# Start server using Gunicorn
+ 
+# Start the Gunicorn server
 CMD ["gunicorn", "my_site.wsgi:application", "--bind", "0.0.0.0:5000"]
