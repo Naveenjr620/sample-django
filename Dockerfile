@@ -29,4 +29,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE 5000
 
 # Start server using Gunicorn
-CMD ["gunicorn", "my_site.wsgi:application", "--bind", "0.0.0.0:8000"]
+CMD ["gunicorn", "my_site.wsgi:application", "--bind", "0.0.0.0:5000"]
